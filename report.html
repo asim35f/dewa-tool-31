@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DEWA Reports — Tanveer Ahmed Road Contracting</title>
+<style>
+:root{
+  --bg:#0a0e1a;--sur:#111827;--sur2:#1a2235;--bor:#1e2d45;
+  --acc:#00c9a7;--mut:#64748b;--tx:#e2e8f0;
+  --red:#ef4444;--grn:#22c55e;--ylw:#f59e0b;--blu:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:40px}
+
+/* ── Header ── */
+.hdr{background:var(--sur);border-bottom:1px solid var(--bor);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.hdr-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--acc),#3b82f6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.hdr-title{font-size:14px;font-weight:700}
+.hdr-sub{font-size:10px;color:var(--mut);margin-top:1px}
+.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn-load{padding:6px 12px;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.4);color:var(--acc);border-radius:7px;cursor:pointer;font-size:12px;font-weight:600}
+.btn-load:hover{background:rgba(0,201,167,.2)}
+#loadStatus{font-size:10px;color:var(--mut)}
+
+/* ── URL Panel ── */
+.url-panel{background:var(--sur2);border-bottom:1px solid var(--bor);padding:8px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.url-panel label{font-size:11px;color:var(--mut);white-space:nowrap}
+.url-panel input{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--bor);color:var(--tx);padding:5px 9px;border-radius:6px;font-size:11px;font-family:monospace}
+.url-panel button{padding:5px 12px;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.4);color:var(--acc);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap}
+
+/* ── Page ── */
+.page{max-width:720px;margin:0 auto;padding:14px}
+
+/* ── Card ── */
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:14px;margin-bottom:18px;overflow:hidden}
+.card-hdr{padding:13px 15px;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:14px;font-weight:700}
+.card-sub{font-size:10px;color:var(--mut);margin-top:2px}
+.card-nav{display:flex;align-items:center;gap:6px}
+.nav-btn{background:var(--sur2);border:1px solid var(--bor);color:var(--tx);width:27px;height:27px;border-radius:6px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{border-color:var(--acc);color:var(--acc)}
+.nav-label{font-size:12px;font-weight:600;min-width:100px;text-align:center}
+
+/* ── Pills ── */
+.pills{display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--bor)}
+.pill{flex:1;min-width:72px;padding:9px 10px;background:var(--sur2);border-radius:8px;text-align:center}
+.pill-val{font-size:24px;font-weight:800;color:var(--grn)}
+.pill-lbl{font-size:10px;color:var(--mut);margin-top:1px}
+.pill-sub{font-size:13px;font-weight:700;color:var(--acc)}
+
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:8px 10px;text-align:left;color:var(--mut);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--bor);white-space:nowrap;background:var(--sur2)}
+th.c{text-align:center}
+th.r{text-align:right}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tbody td{padding:9px 10px;border-bottom:1px solid rgba(30,45,69,.5);white-space:nowrap}
+td.c{text-align:center;font-size:15px;font-weight:700}
+td.r{text-align:right;font-weight:600}
+td.grn{color:var(--grn)}
+td.red{color:var(--red)}
+td.ylw{color:var(--ylw)}
+
+/* ── Footer / Grand Total ── */
+tfoot tr{background:rgba(0,201,167,.06);border-top:2px solid var(--acc)}
+tfoot td{padding:10px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+tfoot td.c{text-align:center;font-size:16px;font-weight:800}
+tfoot td.r{text-align:right;font-size:14px;font-weight:800;color:var(--acc)}
+tfoot td.grn{color:var(--grn);font-size:16px;font-weight:800;text-align:center}
+tfoot td.red{color:var(--red);font-size:16px;font-weight:800;text-align:center}
+tfoot .lbl{color:var(--tx);font-size:12px;font-weight:700}
+
+/* ── Filters ── */
+.filters{padding:10px 14px;border-bottom:1px solid var(--bor);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters label{font-size:11px;color:var(--mut);white-space:nowrap}
+.filters select,.filters input[type=date]{background:var(--sur2);border:1px solid var(--bor);color:var(--tx);padding:5px 8px;border-radius:6px;font-size:11px;min-width:130px}
+.filters select{flex:1}
+.fbtn{padding:6px 13px;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.4);color:var(--acc);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap}
+.fbtn.clr{background:transparent;border-color:var(--mut);color:var(--mut)}
+.fbtn:hover{opacity:.8}
+
+/* ── Footer bar ── */
+.card-foot{padding:9px 13px;border-top:1px solid var(--bor)}
+.btn-wa{width:100%;padding:8px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);color:#25d366;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700}
+.btn-wa:hover{background:rgba(37,211,102,.18)}
+
+/* ── Misc ── */
+.loading{padding:36px;text-align:center;color:var(--mut);font-size:12px}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--bor);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{padding:28px;text-align:center;color:var(--mut);font-size:12px}
+.sep-row td{height:3px;background:rgba(0,201,167,.06);padding:0}
+
+/* Team colours */
+.t-Mubarak{color:#3b82f6}.t-Yousaf,.t-YOUSAF{color:#f59e0b}
+.t-Azeem{color:#a855f7}.t-Mudasir{color:#ec4899}
+.t-Shahbaz{color:#f97316}.t-Other{color:#94a3b8}
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────── -->
+<div class="hdr">
+  <div class="hdr-logo">📊</div>
+  <div>
+    <div class="hdr-title">DEWA Reports</div>
+    <div class="hdr-sub">Tanveer Ahmed Road Contracting LLC</div>
+  </div>
+  <div class="hdr-right">
+    <span id="loadStatus"></span>
+    <button class="btn-load" onclick="loadData()">🔄 Refresh</button>
+  </div>
+</div>
+
+<!-- ── URL Panel ───────────────────────────────────────────────────── -->
+<div class="url-panel">
+  <label>Apps Script URL:</label>
+  <input id="urlInput" type="text" placeholder="Paste your Apps Script URL here…">
+  <button onclick="saveUrl()">Save &amp; Load</button>
+</div>
+
+<div class="page">
+
+  <!-- ── WEEKLY SUMMARY ──────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <div class="card-title">📅 Weekly Summary</div>
+        <div class="card-sub">Completed jobs this week by team</div>
+      </div>
+      <div class="card-nav">
+        <button class="nav-btn" onclick="shiftWeek(-1)">◀</button>
+        <div class="nav-label" id="weekLabel">—</div>
+        <button class="nav-btn" onclick="shiftWeek(1)">▶</button>
+      </div>
+    </div>
+    <div id="weekPills" class="pills" style="display:none"></div>
+    <div class="tbl-wrap"><div id="weekTable"><div class="loading"><div class="spinner"></div><br>Loading…</div></div></div>
+    <div class="card-foot"><button class="btn-wa" onclick="copyWa('week')">📋 Copy Weekly Report for WhatsApp</button></div>
+  </div>
+
+  <!-- ── MONTHLY SUMMARY ─────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <div class="card-title">📆 Monthly Summary</div>
+        <div class="card-sub">Completed jobs this month by team</div>
+      </div>
+      <div class="card-nav">
+        <button class="nav-btn" onclick="shiftMonth(-1)">◀</button>
+        <div class="nav-label" id="monthLabel">—</div>
+        <button class="nav-btn" onclick="shiftMonth(1)">▶</button>
+      </div>
+    </div>
+    <div id="monthPills" class="pills" style="display:none"></div>
+    <div class="tbl-wrap"><div id="monthTable"><div class="loading"><div class="spinner"></div><br>Loading…</div></div></div>
+    <div class="card-foot"><button class="btn-wa" onclick="copyWa('month')">📋 Copy Monthly Report for WhatsApp</button></div>
+  </div>
+
+  <!-- ── DATE-WISE WORK ORDER SUMMARY ───────────────────────────── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <div class="card-title">📋 Date-wise Work Order Summary</div>
+        <div class="card-sub">Assigned date × DEWA engineer — Est. &amp; Actual area</div>
+      </div>
+    </div>
+
+    <!-- Filter row 1: Month + Engineer -->
+    <div class="filters">
+      <label>Month:</label>
+      <select id="monthFilter" onchange="renderDatewise()">
+        <option value="">All Months</option>
+      </select>
+      <label>Engineer:</label>
+      <select id="engFilter" onchange="renderDatewise()">
+        <option value="">All Engineers</option>
+      </select>
+    </div>
+
+    <!-- Filter row 2: Date range -->
+    <div class="filters">
+      <label>From:</label>
+      <input type="date" id="dtFrom">
+      <label>To:</label>
+      <input type="date" id="dtTo">
+      <button class="fbtn" onclick="renderDatewise()">Filter</button>
+      <button class="fbtn clr" onclick="clearFilter()">Clear</button>
+    </div>
+
+    <div class="tbl-wrap"><div id="datewiseTable"><div class="loading"><div class="spinner"></div><br>Loading…</div></div></div>
+    <div class="card-foot"><button class="btn-wa" onclick="copyWa('datewise')">📋 Copy Date-wise Report for WhatsApp</button></div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────
+var WB_URL = localStorage.getItem('dewa_wb_url') || '';
+
+// ── STATE ─────────────────────────────────────────────────────────
+var allJobs     = [];
+var weekOffset  = 0;
+var monthOffset = 0;
+var waTexts     = {week:'', month:'', datewise:''};
+
+// ── TEAM COLOURS ──────────────────────────────────────────────────
+var TC = {Mubarak:'#3b82f6',Yousaf:'#f59e0b',YOUSAF:'#f59e0b',
+          Azeem:'#a855f7',Mudasir:'#ec4899',Shahbaz:'#f97316',Other:'#94a3b8'};
+var TEAMS = ['Mubarak','Yousaf','Azeem','Mudasir','Shahbaz','Other'];
+
+// ── DATE HELPERS ──────────────────────────────────────────────────
+var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function parseDate(s){
+  if(!s) return null;
+  s = String(s).trim();
+  // DD.MM.YYYY
+  var m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
+  // DD/MM/YYYY
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
+  // D Mon YYYY
+  m = s.match(/^(\d{1,2}) ([A-Za-z]{3}) (\d{4})$/);
+  if(m){ var mi=MON.indexOf(m[2]); if(mi>=0) return new Date(+m[3],mi,+m[1]); }
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function fmtDate(d){
+  if(!d) return '';
+  return d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear();
+}
+
+function monthKey(d){ // "Jun 2026"
+  return d ? MON[d.getMonth()]+' '+d.getFullYear() : '';
+}
+
+function getWeekRange(off){
+  var now=new Date(), day=now.getDay();
+  var mon=new Date(now);
+  mon.setDate(now.getDate()-(day===0?6:day-1)+off*7);
+  mon.setHours(0,0,0,0);
+  var sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
+  return {start:mon, end:sun};
+}
+
+function getMonthRange(off){
+  var now=new Date(), y=now.getFullYear(), mo=now.getMonth()+off;
+  while(mo<0){mo+=12;y--;} while(mo>11){mo-=12;y++;}
+  return{start:new Date(y,mo,1,0,0,0,0), end:new Date(y,mo+1,0,23,59,59,999),
+         label:MON[mo]+' '+y};
+}
+
+function inRange(ds, start, end){
+  var d=parseDate(ds);
+  return d && d>=start && d<=end;
+}
+
+// ── LOAD DATA ─────────────────────────────────────────────────────
+function loadData(){
+  if(!WB_URL){
+    document.getElementById('loadStatus').textContent='No URL set';
+    var msg='<div class="empty">⬆ Paste your Apps Script URL above and click Save &amp; Load</div>';
+    ['weekTable','monthTable','datewiseTable'].forEach(function(id){document.getElementById(id).innerHTML=msg;});
+    return;
+  }
+  var st=document.getElementById('loadStatus');
+  st.textContent='⏳ Loading…';
+  ['weekTable','monthTable','datewiseTable'].forEach(function(id){
+    document.getElementById(id).innerHTML='<div class="loading"><div class="spinner"></div><br>Loading…</div>';
+  });
+
+  fetch(WB_URL+'?action=getReportData&_t='+Date.now())
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d.ok) throw new Error(d.msg||'ok:false');
+      allJobs=d.data||[];
+      st.textContent='✔ '+allJobs.length+' jobs';
+      setTimeout(function(){st.textContent='';},4000);
+      populateDropdowns();
+      renderWeekly();
+      renderMonthly();
+      renderDatewise();
+    })
+    .catch(function(e){
+      st.textContent='❌ Error';
+      var msg='<div class="empty" style="text-align:left;padding:18px">'
+        +'<div style="color:var(--red);font-weight:700;margin-bottom:6px">❌ Failed to load data</div>'
+        +'<div style="font-size:11px;color:#94a3b8;margin-bottom:6px">'+e.message+'</div>'
+        +'<div style="font-size:11px;color:var(--mut)">Check: correct Apps Script URL · getReportData deployed · Anyone access</div>'
+        +'</div>';
+      ['weekTable','monthTable','datewiseTable'].forEach(function(id){document.getElementById(id).innerHTML=msg;});
+    });
+}
+
+// ── POPULATE DROPDOWNS ────────────────────────────────────────────
+function populateDropdowns(){
+  var months={}, engs={};
+  allJobs.forEach(function(j){
+    var d=parseDate(j.assignedDate);
+    if(d) months[monthKey(d)]=d.getFullYear()*100+d.getMonth();
+    if(j.dewaEngineer) engs[j.dewaEngineer]=1;
+  });
+
+  // Month dropdown — newest first
+  var mSel=document.getElementById('monthFilter');
+  var mCur=mSel.value;
+  var mList=Object.keys(months).sort(function(a,b){return months[b]-months[a];});
+  mSel.innerHTML='<option value="">All Months</option>';
+  mList.forEach(function(m){
+    var o=document.createElement('option');
+    o.value=m; o.textContent=m; if(m===mCur) o.selected=true;
+    mSel.appendChild(o);
+  });
+
+  // Engineer dropdown — alphabetical
+  var eSel=document.getElementById('engFilter');
+  var eCur=eSel.value;
+  eSel.innerHTML='<option value="">All Engineers</option>';
+  Object.keys(engs).sort().forEach(function(e){
+    var o=document.createElement('option');
+    o.value=e; o.textContent=e; if(e===eCur) o.selected=true;
+    eSel.appendChild(o);
+  });
+}
+
+// ── WEEKLY RENDER ─────────────────────────────────────────────────
+function shiftWeek(d){ weekOffset+=d; renderWeekly(); }
+
+function renderWeekly(){
+  var r=getWeekRange(weekOffset);
+  document.getElementById('weekLabel').textContent=fmtDate(r.start)+' – '+fmtDate(r.end);
+  var gr={}, ga={};
+  TEAMS.forEach(function(t){gr[t]=0;ga[t]=0;});
+  allJobs.forEach(function(j){
+    if(j.status!=='Completed') return;
+    if(!inRange(j.completedDate,r.start,r.end)) return;
+    var t=(j.team||'').trim(); var tt=TEAMS.indexOf(t)>=0?t:'Other';
+    gr[tt]++; ga[tt]+=parseFloat(j.actualArea)||0;
+  });
+  var tot=0,totA=0;
+  TEAMS.forEach(function(t){tot+=gr[t];totA+=ga[t];});
+  var pills=document.getElementById('weekPills');
+  if(!tot){
+    pills.style.display='none';
+    document.getElementById('weekTable').innerHTML='<div class="empty">No completed jobs in this week.</div>';
+    waTexts.week='Weekly: No data for '+document.getElementById('weekLabel').textContent;
+    return;
+  }
+  pills.style.display='flex';
+  pills.innerHTML='<div class="pill"><div class="pill-val">'+tot+'</div><div class="pill-lbl">Jobs Completed</div></div>'
+    +'<div class="pill"><div class="pill-sub">'+totA.toFixed(1)+'</div><div class="pill-lbl">Total m²</div></div>';
+  var rows='', wa=['DEWA Weekly Report','Week: '+document.getElementById('weekLabel').textContent,''];
+  TEAMS.forEach(function(t){
+    if(!gr[t]) return;
+    var col=TC[t]||'#94a3b8';
+    rows+='<tr><td style="color:'+col+';font-weight:700">'+t+'</td>'
+      +'<td class="c" style="color:'+col+'">'+gr[t]+'</td>'
+      +'<td class="r" style="color:'+col+'">'+ga[t].toFixed(1)+'</td></tr>';
+    wa.push(t+': '+gr[t]+' jobs — '+ga[t].toFixed(1)+' m²');
+  });
+  wa.push('','Total: '+tot+' jobs — '+totA.toFixed(1)+' m²');
+  waTexts.week=wa.join('\n');
+  document.getElementById('weekTable').innerHTML=
+    '<table><thead><tr><th>Team</th><th class="c">Jobs</th><th class="r">Area m²</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody>'
+    +'<tfoot><tr><td class="lbl"><b>TOTAL</b></td>'
+    +'<td class="c grn">'+tot+'</td>'
+    +'<td class="r">'+totA.toFixed(1)+'</td></tr></tfoot></table>';
+}
+
+// ── MONTHLY RENDER ────────────────────────────────────────────────
+function shiftMonth(d){ monthOffset+=d; renderMonthly(); }
+
+function renderMonthly(){
+  var r=getMonthRange(monthOffset);
+  document.getElementById('monthLabel').textContent=r.label;
+  var gr={}, ga={};
+  TEAMS.forEach(function(t){gr[t]=0;ga[t]=0;});
+  allJobs.forEach(function(j){
+    if(j.status!=='Completed') return;
+    if(!inRange(j.completedDate,r.start,r.end)) return;
+    var t=(j.team||'').trim(); var tt=TEAMS.indexOf(t)>=0?t:'Other';
+    gr[tt]++; ga[tt]+=parseFloat(j.actualArea)||0;
+  });
+  var tot=0,totA=0;
+  TEAMS.forEach(function(t){tot+=gr[t];totA+=ga[t];});
+  var pills=document.getElementById('monthPills');
+  if(!tot){
+    pills.style.display='none';
+    document.getElementById('monthTable').innerHTML='<div class="empty">No completed jobs in '+r.label+'.</div>';
+    waTexts.month='Monthly: No data for '+r.label;
+    return;
+  }
+  pills.style.display='flex';
+  pills.innerHTML='<div class="pill"><div class="pill-val">'+tot+'</div><div class="pill-lbl">Jobs Completed</div></div>'
+    +'<div class="pill"><div class="pill-sub">'+totA.toFixed(1)+'</div><div class="pill-lbl">Total m²</div></div>';
+  var rows='', wa=['DEWA Monthly Report','Month: '+r.label,''];
+  TEAMS.forEach(function(t){
+    if(!gr[t]) return;
+    var col=TC[t]||'#94a3b8';
+    rows+='<tr><td style="color:'+col+';font-weight:700">'+t+'</td>'
+      +'<td class="c" style="color:'+col+'">'+gr[t]+'</td>'
+      +'<td class="r" style="color:'+col+'">'+ga[t].toFixed(1)+'</td></tr>';
+    wa.push(t+': '+gr[t]+' jobs — '+ga[t].toFixed(1)+' m²');
+  });
+  wa.push('','Total: '+tot+' jobs — '+totA.toFixed(1)+' m²');
+  waTexts.month=wa.join('\n');
+  document.getElementById('monthTable').innerHTML=
+    '<table><thead><tr><th>Team</th><th class="c">Jobs</th><th class="r">Area m²</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody>'
+    +'<tfoot><tr><td class="lbl"><b>TOTAL</b></td>'
+    +'<td class="c grn">'+tot+'</td>'
+    +'<td class="r">'+totA.toFixed(1)+'</td></tr></tfoot></table>';
+}
+
+// ── DATE-WISE RENDER ──────────────────────────────────────────────
+function clearFilter(){
+  document.getElementById('dtFrom').value='';
+  document.getElementById('dtTo').value='';
+  document.getElementById('engFilter').value='';
+  document.getElementById('monthFilter').value='';
+  renderDatewise();
+}
+
+function renderDatewise(){
+  var fromVal  = document.getElementById('dtFrom').value;
+  var toVal    = document.getElementById('dtTo').value;
+  var engVal   = document.getElementById('engFilter').value;
+  var monVal   = document.getElementById('monthFilter').value;
+  var fromD    = fromVal ? new Date(fromVal+'T00:00:00') : null;
+  var toD      = toVal   ? new Date(toVal+'T23:59:59')   : null;
+
+  var groups={};
+
+  allJobs.forEach(function(j){
+    var ad  = j.assignedDate||'';
+    var eng = j.dewaEngineer||'Unknown';
+    var key = ad+'|||'+eng;
+
+    // Engineer filter
+    if(engVal && eng!==engVal) return;
+
+    // Month filter (matches "Jun 2026" from monthKey)
+    if(monVal){
+      var pd=parseDate(ad);
+      if(!pd || monthKey(pd)!==monVal) return;
+    }
+
+    // Date range filter
+    if(fromD||toD){
+      var pd2=parseDate(ad);
+      if(!pd2) return;
+      if(fromD && pd2<fromD) return;
+      if(toD   && pd2>toD)   return;
+    }
+
+    if(!groups[key]){
+      var sortK=parseDate(ad)?parseDate(ad).getTime():0;
+      groups[key]={date:ad,engineer:eng,total:0,completed:0,pending:0,
+                   estArea:0,actArea:0,sortKey:sortK};
+    }
+    var g=groups[key];
+    g.total++;
+    g.estArea += parseFloat(j.estArea)||0;
+    if(j.status==='Completed'){
+      g.completed++;
+      g.actArea += parseFloat(j.actualArea)||0;
+    } else {
+      g.pending++;
+    }
+  });
+
+  var rows=Object.values(groups);
+  if(!rows.length){
+    document.getElementById('datewiseTable').innerHTML='<div class="empty">No work orders found for selected filters.</div>';
+    waTexts.datewise='Date-wise Report: No data';
+    return;
+  }
+
+  // Sort newest first
+  rows.sort(function(a,b){return b.sortKey-a.sortKey;});
+
+  // 7 columns: Date | Engineer | Total | Done | Pending | Est.Area | Act.Area
+  var tbl='<table>'
+    +'<thead><tr>'
+    +'<th>Date</th>'
+    +'<th>DEWA Engineer</th>'
+    +'<th class="c">Total</th>'
+    +'<th class="c">Done</th>'
+    +'<th class="c">Pending</th>'
+    +'<th class="r">Est. m²</th>'
+    +'<th class="r">Actual m²</th>'
+    +'</tr></thead><tbody>';
+
+  var waLines=['DEWA Date-wise Work Order Report',''];
+  var lastDate='';
+  var gTot=0,gComp=0,gPend=0,gEst=0,gAct=0;
+
+  rows.forEach(function(g){
+    if(lastDate && g.date!==lastDate){
+      tbl+='<tr class="sep-row"><td colspan="7"></td></tr>';
+    }
+    lastDate=g.date;
+    gTot+=g.total; gComp+=g.completed; gPend+=g.pending;
+    gEst+=g.estArea; gAct+=g.actArea;
+
+    tbl+='<tr>'
+      +'<td style="font-size:11px;color:#94a3b8;font-weight:600">'+g.date+'</td>'
+      +'<td style="font-size:11px;font-weight:700;color:#818cf8">'+g.engineer+'</td>'
+      +'<td class="c">'+g.total+'</td>'
+      +'<td class="c grn">'+g.completed+'</td>'
+      +'<td class="c '+(g.pending>0?'red':'grn')+'">'+g.pending+'</td>'
+      +'<td class="r" style="color:var(--ylw)">'+g.estArea.toFixed(1)+'</td>'
+      +'<td class="r" style="color:var(--acc)">'+g.actArea.toFixed(1)+'</td>'
+      +'</tr>';
+
+    waLines.push(g.date+' | '+g.engineer);
+    waLines.push('  Total:'+g.total+' Done:'+g.completed+' Pending:'+g.pending
+      +' Est:'+g.estArea.toFixed(1)+'m² Actual:'+g.actArea.toFixed(1)+'m²');
+  });
+
+  tbl+='</tbody>'
+    +'<tfoot><tr>'
+    +'<td class="lbl" colspan="2">GRAND TOTAL</td>'
+    +'<td class="c">'+gTot+'</td>'
+    +'<td class="c grn">'+gComp+'</td>'
+    +'<td class="c '+(gPend>0?'red':'grn')+'">'+gPend+'</td>'
+    +'<td class="r" style="color:var(--ylw);font-size:14px;font-weight:800">'+gEst.toFixed(1)+'</td>'
+    +'<td class="r">'+gAct.toFixed(1)+'</td>'
+    +'</tr></tfoot></table>';
+
+  waLines.push('','Grand Total: '+gTot+' jobs | Done: '+gComp
+    +' | Pending: '+gPend+' | Est: '+gEst.toFixed(1)+'m² | Actual: '+gAct.toFixed(1)+'m²');
+  waTexts.datewise=waLines.join('\n');
+
+  document.getElementById('datewiseTable').innerHTML=tbl;
+}
+
+// ── WHATSAPP COPY ─────────────────────────────────────────────────
+function copyWa(key){
+  var txt=waTexts[key]||'No data';
+  var ta=document.createElement('textarea');
+  ta.value=txt; ta.style.cssText='position:fixed;top:-9999px';
+  document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+  document.body.removeChild(ta);
+  var btn=event.target;
+  var orig=btn.textContent;
+  btn.textContent='✔ Copied!';
+  setTimeout(function(){btn.textContent=orig;},2000);
+}
+
+// ── URL SAVE ──────────────────────────────────────────────────────
+function saveUrl(){
+  var val=document.getElementById('urlInput').value.trim();
+  if(!val){alert('Please paste your Apps Script URL first.');return;}
+  localStorage.setItem('dewa_wb_url',val);
+  WB_URL=val;
+  loadData();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',function(){
+  var saved=localStorage.getItem('dewa_wb_url')||'';
+  document.getElementById('urlInput').value=saved;
+  if(saved){ WB_URL=saved; loadData(); }
+  else {
+    var msg='<div class="empty">⬆ Paste your Apps Script URL above and click Save &amp; Load</div>';
+    ['weekTable','monthTable','datewiseTable'].forEach(function(id){document.getElementById(id).innerHTML=msg;});
+    document.getElementById('loadStatus').textContent='No URL set';
+  }
+});
+</script>
+</body>
+</html>
